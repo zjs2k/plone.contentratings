@@ -30,11 +30,19 @@ var token = $('#protect-script').attr('data-token');
 $(document).on('click', '.Rating ul.star-rating a.rate', function (e) {
 	e.preventDefault();
 	var category = kssAttr(this, 'category') || 'default';
-	$.post(baseUrl + '/updateRating', {
+	// get the query parameters from href for post
+	var urlString = $(this).attr("href");
+	var queryString = urlString.substring(urlString.indexOf("?"));
+	var urlParams = new URLSearchParams(queryString);
+	var inputData = {
 		rating_class: $(this).attr('class'),
 		category: category,
 		_authenticator: token
-	}, function (data) {
+	};
+	for (const entry of urlParams.entries()) {
+		inputData[entry[0]] = entry[1];
+	};
+	$.post(baseUrl + '/updateRating', inputData, function (data) {
 		$('.Rating#rating-stars-view-' + category).replaceWith(data);
 	});
 });
